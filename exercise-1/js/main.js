@@ -10,28 +10,7 @@ $(function() {
 
 		// variable to visualize
 		var measure = 'fertility_rate';
-		var color = d3.scale.category20c();
-
-		// Treemap function
-		var treemap = d3.layout.treemap() // function that returns a function!
-				.size([width, height]) // set size: scaling will be done internally
-				.sticky(true) // If data changes, keep elements in the same position
-				.value(function(d) {return d[measure];}) // Assert value to be used to
-				.children(function(d){return d.values;}); // Determine how the function will find the children of each node
-
-		// Function to arrange divs (will be called seperately for entering and updating)
-		var position = function() {
-			this.style("left", function(d,i) {console.log(i); return d.x + "px"; })
-					.style("top", function(d) { return d.y + "px"; })
-					.style('width', function(d){return d.dx + 'px'})
-					.style("height", function(d) { return d.dy + "px"; })
-					.style("background", function(d) {console.log(d.parent);return !d.values ? color(d.region) : null; })
-		}
-
-		// Nest the data
-		nestedData = d3.nest() // function that returns a function...
-								 .key(function(d){return d.region;}) 
-								 .entries(data);
+		var color = d3.scale.category10();
 
 		// Wrapper div for the chart
 		var div = d3.select('#vis')
@@ -41,15 +20,38 @@ $(function() {
 								.style("left", margin.left + "px")
 								.style("top", margin.top + "px");
 
-		// Function to bind data, position elements
-		var draw = function() {
-			// Set value to be used to size each div
-			treemap.value(function(d) {console.log(d[measure]);return d[measure];})
+		// Function to arrange divs (will be called seperately for entering and updating)
+		var position = function() {
+			// Set the position of each div using the properties computed from the treemap function
+			this.style("left", function(d,i) {return d.x + "px"; })
+					.style("top", function(d) { return d.y + "px"; })
+					.style('width', function(d){return d.dx + 'px'})
+					.style("height", function(d) { return d.dy + "px"; })
+					.style("background", function(d) {return !d.values ? color(d.region) : null; })
+		}
 
-			// Nodes in the tree
+		// Construct a nest function using `d3.nest`, and create a variable with your nested data
+		var nestedData = d3.nest() // function that returns a function...
+								 .key(function(d){return d.region;})
+								 .entries(data);
+
+		 // Construct a treemap function that sizes elements based on the current `measure`, and
+		 // Make sure to specify how to retrieve the `children` from each element
+		 var treemap = d3.layout.treemap() // function that returns a function!
+		 		.size([width, height]) // set size: scaling will be done internally
+		 		.sticky(true) // If data changes, keep elements in the same position
+		 		.value(function(d) {return d[measure];}) // Assert value to be used to
+		 		.children(function(d){return d.values;}); // Determine how the function will find the children of each node
+
+		// Write your `draw` function to bind data, and position elements
+		var draw = function() {
+			// Set the `value` property of your `treemap` fucntion, as it may have changed
+			treemap.value(function(d) {return d[measure];});
+
+			// Bind your data to a selection of node elements
 			var nodes = div.selectAll(".node").data(treemap.nodes({values:nestedData}));
 
-			// Enter and append elements, then position them
+			// Enter and append elements, then position them by using `.call`
 			nodes.enter()
 					 .append("div")
 					 .attr('class', 'node')
@@ -57,14 +59,18 @@ $(function() {
 				   .call(position); // This prevents a strange transition on enter()
 
 			// Update the nodes
-			nodes.transition().duration(500).call(position)
+			nodes.transition().duration(500).call(position);
 		}
+
+		// Call your draw function
 		draw();
 
-		// Event handler
+		// Listen to change events on the input elements
 		$("input").on('change', function() {
-			// Get value, determine if it is the sex or type controller
+			// Set your measure variable to the value (which is used in the draw funciton)
 			measure = $(this).val();
+
+			// Draw your elements
 			draw();
 		});
 

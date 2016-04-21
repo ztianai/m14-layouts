@@ -19,13 +19,10 @@
 		<p>This exercise challenges you to use <a href = "https://github.com/mbostock/d3/wiki/Layouts" target="_blank">D3 Layout Functions</a> to build a Treemap. In your <code>js/main.js</code> file, do the following:
 		<div class="instructions">
 			<ul>
-				<li>Read in your <code>data/prepped_data.csv</code> file using the <code>d3.csv</code> function</li>
-				<li>Define scales to position GDP in a horizontal direction, and Life Expectancy in a vertical direction. You should use log and linear scales (respectively)</li>
-				<li>Add circle elements to your screen for each element in your dataset by performing a data-join. Note, you should bind data to the <code>g</code> element insdie your SVG to better facilitate arranging your elements</li>
-				<li>Define axes and append them to your DOM</li>
-				<li>Append <code>text</code> elements to your DOM to represent axis labels.</li>
-				<li><strong>Bonus:</strong> Color each point by region, and add a legend (remember, a legend is just a set of HTML elements that look like a legend)</li>
-				<li><strong>Bonus:</strong> Size each point by fertility, and add a legend (remember, a legend is just a set of HTML elements that look like a legend)</li>
+				<li>Construct a nest function using <code>d3.nest</code>, and create a variable with your nested data</li>
+				<li>Construct a treemap function that sizes elements based on the current <code>measure</code>, and make sure to specify how to retrieve the <code>children</code> from each element</li>
+				<li>Write your <code>draw</code> function to bind data, and position elements. Similarly to how you would set your scales in a draw function, you will have to update your <code>treemap</code> function to reflect the current data.</li>
+				<li>Fill in the event listener such that clicking on the buttons updates the chart.</li>
 			</ul>
 		</div>
 		<div class="btn-group" data-toggle="buttons">
