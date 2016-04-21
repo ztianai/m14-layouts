@@ -31,47 +31,21 @@ $(function() {
 		}
 
 		// Construct a nest function using `d3.nest`, and create a variable with your nested data
-		var nestedData = d3.nest() // function that returns a function...
-								 .key(function(d){return d.region;})
-								 .entries(data);
 
-		 // Construct a treemap function that sizes elements based on the current `measure`, and
-		 // Make sure to specify how to retrieve the `children` from each element
-		 var treemap = d3.layout.treemap() // function that returns a function!
-		 		.size([width, height]) // set size: scaling will be done internally
-		 		.sticky(true) // If data changes, keep elements in the same position
-		 		.value(function(d) {return d[measure];}) // Assert value to be used to
-		 		.children(function(d){return d.values;}); // Determine how the function will find the children of each node
+		// Construct a treemap function that sizes elements based on the current `measure`, and
+		// Make sure to specify how to retrieve the `children` from each element
+
 
 		// Write your `draw` function to bind data, and position elements
-		var draw = function() {
-			// Set the `value` property of your `treemap` fucntion, as it may have changed
-			treemap.value(function(d) {return d[measure];});
 
-			// Bind your data to a selection of node elements
-			var nodes = div.selectAll(".node").data(treemap.nodes({values:nestedData}));
-
-			// Enter and append elements, then position them by using `.call`
-			nodes.enter()
-					 .append("div")
-					 .attr('class', 'node')
-					 .text(function(d){return d.country_code}) // Set text: a big advantage of using divs over rects
-				   .call(position); // This prevents a strange transition on enter()
-
-			// Update the nodes
-			nodes.transition().duration(500).call(position);
-		}
 
 		// Call your draw function
-		draw();
+
 
 		// Listen to change events on the input elements
 		$("input").on('change', function() {
-			// Set your measure variable to the value (which is used in the draw funciton)
-			measure = $(this).val();
 
-			// Draw your elements
-			draw();
+			
 		});
 
 	});
