@@ -1,21 +1,8 @@
-# Module 9: D3 Layout Functions
+# Layout Functions
 
-## Overview
 In this module, we'll introduce [D3 Layout Functions](https://github.com/mbostock/d3/wiki/Layouts) that facilitate manipulating your data structure to express hierarchical relationships. We'll use the example of a [Treemap](http://www.cs.umd.edu/hcil/treemap-history/) to examine the value of the layout functions.
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Contents**
 
-- [Resources](#resources)
-- [Data Preparation](#data-preparation)
-  - [Data Structure](#data-structure)
-  - [Nesting Data](#nesting-data)
-- [Treemaps](#treemaps)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-## Resources
-Here are a few resources to help you better understand and use scales.
+Helpful links:
 
 - [D3 Layouts](https://github.com/mbostock/d3/wiki/Layouts) _(d3 wiki)_
 - [Nest Method](https://github.com/mbostock/d3/wiki/Arrays#nest) _(d3 wiki)_
@@ -29,14 +16,14 @@ While hierarchical layouts in D3 _look_ quite impressive, it's important to reme
 ### Data Structure
 D3 layouts that express hierarchical data presume that your data is appropriately structured. For example, in the data used in [this example](https://bl.ocks.org/mbostock/4063582), the following structure is used:
 
-![screenshot of nested data](imgs/flare.png)
+![screenshot of nested data](m14-imgs/flare.png)
 
 The `.json` object is in a fairly standard structure. Note, each **object** has a **children array** which stores child nodes. At each **leaf node**, the children have a value that you want to visualize (in this case, `size`). While this data structure may be common in web oriented data storage platforms or `NoSQL` databases, it is quite distinct from how the data would be stored in a relational or tabular (i.e., `.csv`) format. Luckily, D3 provides us with methods for constructing a data tree from arrays of objects (the expected format for your relational data).
 
 ### Nesting Data
 Let's assume that you data isn't stored in the necessary `.json` object, but instead is in a 2D table such as the following:
 
-![screenshot of tabular data](imgs/tabular-data.png)
+![screenshot of tabular data](m14-imgs/tabular-data.png)
 
 This data has a natural hierarchy in which each **country** has a parent **region**. The `d3.nest` method will allow us to construct a tree using the following syntax:
 
@@ -59,14 +46,14 @@ var nestedData = nest.entries(data);
 ```
 The above section allows you to specify a **function** (`nest`) whose `entries` method will transform a tabular dataset into a nested data-object. The `key` value allows you to specify the value of each object that indicates the element's parent. The section above results in the following `nestedData` object:
 
-![screenshot of nested data](imgs/nested-data.png)
+![screenshot of nested data](m14-imgs/nested-data.png)
 
 ## Treemaps
 Treemaps allow you express data values for hierarchical data in a rectangular layout such as this [example](http://vizhub.healthdata.org/gbd-compare/) categorizing global disease burden into communicable diseases (red), non-communicable diseases (blue), and injuries (green).
 
-![screenshot of a treemap](imgs/treemap.png)
+![screenshot of a treemap](m14-imgs/treemap.png)
 
-Treemaps can be built either with `div` or `rect` elements, each of which has its own advantages. The example provided in [exercise-1](exercise-1) will use `div` elements, primarily because they enable simple text labeling, without having to worry about appending `text` elements (you can just set the `text` attribute of a `div`). As noted above, the challenge involved with building hierarchical layouts is computing the desired position of each element base on your data. To compute element positions, you'll  use the function exposed by the `d3.layout.treemap` method. Note, this method will take care of all of the scaling necessary, so you only need to specify your desired `width` and `height` for your layout:
+Treemaps can be built either with `div` or `rect` elements, each of which has its own advantages. The example provided in [exercise-1](http://github.com/info474-s17/m14-layouts/tree/master/exercise-1) will use `div` elements, primarily because they enable simple text labeling, without having to worry about appending `text` elements (you can just set the `text` attribute of a `div`). As noted above, the challenge involved with building hierarchical layouts is computing the desired position of each element base on your data. To compute element positions, you'll  use the function exposed by the `d3.layout.treemap` method. Note, this method will take care of all of the scaling necessary, so you only need to specify your desired `width` and `height` for your layout:
 
 ```javascript
 // Construct a treemap function that will retrieve values from your nested data
@@ -93,6 +80,6 @@ var treemapData = treemap.nodes({values:nestedData})
 
 It's important to remember that this method will return an object for **all items in your tree**, including parent nodes. The method calculates attributes for positiong each element, and also tracks the `depth` of each item:
 
-![screenshot of treemap data](imgs/treemap-data.png)
+![screenshot of treemap data](m14-imgs/treemap-data.png)
 
-At this point, the necessary values have been calculated, and you can proceed with the data-join to create your visualization. To practice building a treemap, see [exercise-1](exercise-1).
+At this point, the necessary values have been calculated, and you can proceed with the data-join to create your visualization. To practice building a treemap, see [exercise-1](http://github.com/info474-s17/m14-layouts/tree/master/exercise-1).
