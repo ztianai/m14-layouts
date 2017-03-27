@@ -53,7 +53,7 @@ Treemaps allow you express data values for hierarchical data in a rectangular la
 
 ![screenshot of a treemap](m14-imgs/treemap.png)
 
-Treemaps can be built either with `div` or `rect` elements, each of which has its own advantages. The example provided in [exercise-1](exercise-1) will use `div` elements, primarily because they enable simple text labeling, without having to worry about appending `text` elements (you can just set the `text` attribute of a `div`). As noted above, the challenge involved with building hierarchical layouts is computing the desired position of each element base on your data. To compute element positions, you'll  use the function exposed by the `d3.layout.treemap` method. Note, this method will take care of all of the scaling necessary, so you only need to specify your desired `width` and `height` for your layout:
+Treemaps can be built either with `div` or `rect` elements, each of which has its own advantages. The example provided in [exercise-1](http://github.com/info474-s17/m14-layouts/tree/master/exercise-1) will use `div` elements, primarily because they enable simple text labeling, without having to worry about appending `text` elements (you can just set the `text` attribute of a `div`). As noted above, the challenge involved with building hierarchical layouts is computing the desired position of each element base on your data. To compute element positions, you'll  use the function exposed by the `d3.layout.treemap` method. Note, this method will take care of all of the scaling necessary, so you only need to specify your desired `width` and `height` for your layout:
 
 ```javascript
 // Construct a treemap function that will retrieve values from your nested data
@@ -82,4 +82,4 @@ It's important to remember that this method will return an object for **all item
 
 ![screenshot of treemap data](m14-imgs/treemap-data.png)
 
-At this point, the necessary values have been calculated, and you can proceed with the data-join to create your visualization. To practice building a treemap, see [exercise-1](exercise-1).
+At this point, the necessary values have been calculated, and you can proceed with the data-join to create your visualization. To practice building a treemap, see [exercise-1](http://github.com/info474-s17/m14-layouts/tree/master/exercise-1).
