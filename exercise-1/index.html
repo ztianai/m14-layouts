@@ -1,44 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Module 9: Exercise 1</title>
 
-		<!-- Libraries -->
-		<script src="https://code.jquery.com/jquery.min.js"></script>
-		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-		<script src="http://d3js.org/d3.v3.min.js"></script>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiearchy: Exercise 1</title>
 
-		<!-- Custom files -->
-		<link rel="stylesheet" href="css/main.css"/>
-	</head>
-	<body class="container">
-		<h1>Welcome to Module 9 Exercise 1</h1>
-		<p>This exercise challenges you to use <a href = "https://github.com/mbostock/d3/wiki/Layouts" target="_blank">D3 Layout Functions</a> to build a Treemap. In your <code>js/main.js</code> file, do the following:
-		<div class="instructions">
-			<ul>
-				<li>Construct a nest function using <code>d3.nest</code>, and create a variable with your nested data</li>
-				<li>Construct a treemap function that sizes elements based on the current <code>measure</code>, and make sure to specify how to retrieve the <code>children</code> from each element</li>
-				<li>Write your <code>draw</code> function to bind data, and position elements. Make sure to assign elements class <code>node</code> (see <code>css/main.css</code> to see why). Similarly to how you would set your scales in a draw function, you will have to update your <code>treemap</code> function to reflect the current data.</li>
-				<li>Fill in the event listener such that clicking on the buttons updates the chart.</li>
-			</ul>
-		</div>
-		<div class="btn-group" data-toggle="buttons">
-			<label class="btn btn-primary">
+    <!-- Libraries -->
+    <script src="https://code.jquery.com/jquery.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="http://d3js.org/d3.v4.js"></script>
+
+    <!-- Custom files -->
+    <link rel="stylesheet" href="css/main.css" />
+</head>
+
+<body class="container">
+    <h1>Welcome to Hierarhcy Exercise 1</h1>
+    <p>This exercise challenges you to use <a href="https://github.com/mbostock/d3/wiki/Layouts" target="_blank">D3 Layout Functions</a> to build a Treemap. In your <code>js/main.js</code> file, do the following:
+        <div class="instructions">
+            <ul>
+                <li>Create hierarchical data structure & treemap function
+                    <ul>
+                        <li>Nest your data <strong>by region</strong> by using the <code>d3.nest</code> function.</li>
+                        <li>Place your data in a single hierarchical object by using the <code>d3.hierarchy()</code> function</li>
+                    </ul>
+                </li>
+                <li>Create an ordinal color scale
+                    <ul>
+                        <li>Get a list of your regions from your nested data object. This will be the <code>domain</code> of your ordinal scale.</li>
+                        <li>Use <code>d3.scaleOrdinal()</code> to create an ordinal scale. Your <code>domain</code>will be your <strong>region names</strong> and your <strong>range</strong> should be the colors stored in the variable <code>d3.schemeCategory10</code></li>
+                    </ul>
+                </li>
+
+                <li>Write your <code>draw</code> function to bind data, and position elements.</li>
+                <ul>
+                    <li> Redefine which value you want to visualize in your data by using the <code>.sum()</code> method of your <code>root</code> object.</li>
+                    <li> Perform a data-join between you selection of elements with class <code>node</code> and the array of objects returned by <code>root.leaves()</code></li>
+                </ul>
+            </ul>
+        </div>
+        <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-primary">
 				<input value="gdp" type="radio" name="options" id="option1" autocomplete="off">GDP Per Capita
 			</label>
-			<label class="btn btn-primary active">
-				<input value="life_expectancy" type="radio" name="options" id="option2" autocomplete="off" checked>Life Expectancy
+            <label class="btn btn-primary">
+				<input value="life_expectancy" type="radio" name="options" id="option2" autocomplete="off" >Life Expectancy
 			</label>
-			<label class="btn btn-primary active">
+            <label class="btn btn-primary active">
 				<input value="fertility_rate" type="radio" name="options" id="option2" autocomplete="off" checked>Fertility Rate
 			</label>
-		</div>
-		<div id="vis"></div>
-	</body>
+        </div>
+        <div id="vis"></div>
+</body>
 
-	<!-- your script file -->
-	<script src="js/main.js"></script>
+<!-- your script file -->
+<script src="js/main.js"></script>
+
 </html>
