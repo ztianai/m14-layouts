@@ -1,78 +1,115 @@
 /* Create a treemap of country level measures. Inspiration drawn from https://bl.ocks.org/mbostock/4063582.
-*/
+ */
 $(function() {
-	// Read in your data. On success, run the rest of your code
-	d3.csv('data/prepped_data.csv', function(error, data){
-		// Setting defaults
-		var margin = {top: 40, right: 10, bottom: 10, left: 10},
-		    width = 960 - margin.left - margin.right,
-		    height = 500 - margin.top - margin.bottom;
+    // Read in your data. On success, run the rest of your code
+    d3.csv('data/prepped_data.csv', function(error, data) {
 
-		// variable to visualize
-		var measure = 'fertility_rate';
-		var color = d3.scale.category10();
+        // Setting defaults
+        var margin = {
+                top: 40,
+                right: 10,
+                bottom: 10,
+                left: 10
+            },
+            width = 960,
+            height = 500,
+            drawWidth = width - margin.left - margin.right,
+            drawHeight = height - margin.top - margin.bottom,
+            measure = 'fertility_rate'; // variable to visualize
 
-		// Wrapper div for the chart
-		var div = d3.select('#vis')
-								.append("div")
-								.attr('height', 600)
-								.attr('width', 600)
-								.style("left", margin.left + "px")
-								.style("top", margin.top + "px");
+        // Nest your data *by region* using d3.nest()
+        var nestedData = d3.nest()
+            .key(function(d) {
+                return d.region;
+            })
+            .entries(data);
 
-		// Function to arrange divs (will be called seperately for entering and updating)
-		var position = function() {
-			// Set the position of each div using the properties computed from the treemap function
-			this.style("left", function(d,i) {return d.x + "px"; })
-					.style("top", function(d) { return d.y + "px"; })
-					.style('width', function(d){return d.dx + 'px'})
-					.style("height", function(d) { return d.dy + "px"; })
-					.style("background", function(d) {return !d.values ? color(d.region) : null; })
-		}
+        // Get list of regions for colors
+        var regions = nestedData.map(function(d) {
+            return d.key
+        });
 
-		// Construct a nest function using `d3.nest`, and create a variable with your nested data
-		var nestedData = d3.nest() // function that returns a function...
-								 .key(function(d){return d.region;})
-								 .entries(data);
+        // Set an ordinal scale
+        var colorScale = d3.scaleOrdinal().domain(regions).range(d3.schemeCategory10)
 
-		 // Construct a treemap function that sizes elements based on the current `measure`, and
-		 // Make sure to specify how to retrieve the `children` from each element
-		 var treemap = d3.layout.treemap() // function that returns a function!
-		 		.size([width, height]) // set size: scaling will be done internally
-		 		.sticky(true) // If data changes, keep elements in the same position
-		 		.value(function(d) {return d[measure];}) // Assert value to be used to
-		 		.children(function(d){return d.values;}); // Determine how the function will find the children of each node
+        // Hierarhcy
+        var root = d3.hierarchy({
+                values: nestedData
+            }, function(d) {
+                return d.values;
+            })
+            .sum(function(d) {
+                return +d[measure];
+            });
 
-		// Write your `draw` function to bind data, and position elements
-		var draw = function() {
-			// Set the `value` property of your `treemap` fucntion, as it may have changed
-			treemap.value(function(d) {return d[measure];});
 
-			// Bind your data to a selection of node elements
-			var nodes = div.selectAll(".node").data(treemap.nodes({values:nestedData}));
+        // Append a wrapper div for the chart
+        var div = d3.select('#vis')
+            .append("div")
+            .attr('height', height)
+            .attr('width', width)
+            .style("left", margin.left + "px")
+            .style("top", margin.top + "px");
 
-			// Enter and append elements, then position them by using `.call`
-			nodes.enter()
-					 .append("div")
-					 .attr('class', 'node')
-					 .text(function(d){return d.country_code}) // Set text: a big advantage of using divs over rects
-				   .call(position); // This prevents a strange transition on enter()
 
-			// Update the nodes
-			nodes.transition().duration(500).call(position);
-		}
+        // Create a *treemap function* that will compute your layout given your data structure
+        var treemap = d3.treemap() // function that returns a function!
+            .size([width, height]) // set size: scaling will be done internally
+            .round(true)
+            .tile(d3.treemapResquarify)
+            .padding(1);
 
-		// Call your draw function
-		draw();
+        // Write your `draw` function to bind data, and position elements
+        var draw = function() {
+            // Redefine which variable you want to visualize
+            root.sum(function(d) {
+                return +d[measure];
+            });
 
-		// Listen to change events on the input elements
-		$("input").on('change', function() {
-			// Set your measure variable to the value (which is used in the draw funciton)
-			measure = $(this).val();
+            // (Re)build your treemap data structure using your  root
+            treemap(root);
 
-			// Draw your elements
-			draw();
-		});
+            // Bind your data to a selection of node elements
+            var nodes = div.selectAll(".node").data(root.leaves());
 
-	});
+            // Enter and append elements, then position them using the appropriate *styles*
+            nodes.enter()
+                .append("div")
+                .text(function(d) {
+                    return d.data.country_code;
+                })
+                .merge(nodes)
+                .attr('class', 'node')
+                .transition().duration(1500)
+                .style("left", function(d, i) {
+                    console.log(d)
+                    return d.x0 + "px";
+                })
+                .style("top", function(d) {
+                    return d.y0 + "px";
+                })
+                .style('width', function(d) {
+                    return d.x1 - d.x0 + 'px'
+                })
+                .style("height", function(d) {
+                    return d.y1 - d.y0 + "px";
+                })
+                .style("background", function(d, i) {
+                    console.log(d.region);
+                    return colorScale(d.data.region);
+                });
+        };
+
+        // Call your draw function
+        draw();
+
+        // Listen to change events on the input elements
+        $("input").on('change', function() {
+            // Set your measure variable to the value (which is used in the draw funciton)
+            measure = $(this).val();
+
+            // Draw your elements
+            draw();
+        });
+    });
 });
