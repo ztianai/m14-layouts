@@ -17,32 +17,6 @@ $(function() {
             drawHeight = height - margin.top - margin.bottom,
             measure = 'fertility_rate'; // variable to visualize
 
-        // Nest your data *by region* using d3.nest()
-        var nestedData = d3.nest()
-            .key(function(d) {
-                return d.region;
-            })
-            .entries(data);
-
-        // Get list of regions for colors
-        var regions = nestedData.map(function(d) {
-            return d.key
-        });
-
-        // Set an ordinal scale
-        var colorScale = d3.scaleOrdinal().domain(regions).range(d3.schemeCategory10)
-
-        // Hierarhcy
-        var root = d3.hierarchy({
-                values: nestedData
-            }, function(d) {
-                return d.values;
-            })
-            .sum(function(d) {
-                return +d[measure];
-            });
-
-
         // Append a wrapper div for the chart
         var div = d3.select('#vis')
             .append("div")
@@ -51,25 +25,55 @@ $(function() {
             .style("left", margin.left + "px")
             .style("top", margin.top + "px");
 
+        /* ********************************** Create hierarchical data structure & treemap function  ********************************** */
+
+        // Nest your data *by region* using d3.nest()
+        var nestedData = d3.nest()
+            .key(function(d) {
+                return d.region;
+            })
+            .entries(data);
+
+        // Define a hierarchy for your data
+        var root = d3.hierarchy({
+            values: nestedData
+        }, function(d) {
+            return d.values;
+        });
+
 
         // Create a *treemap function* that will compute your layout given your data structure
         var treemap = d3.treemap() // function that returns a function!
             .size([width, height]) // set size: scaling will be done internally
             .round(true)
             .tile(d3.treemapResquarify)
-            .padding(1);
+            .padding(0);
+
+        /* ********************************** Create an ordinal color scale  ********************************** */
+
+        // Get list of regions for colors
+        var regions = nestedData.map(function(d) {
+            return d.key;
+        });
+
+        // Set an ordinal scale for colors
+        var colorScale = d3.scaleOrdinal().domain(regions).range(d3.schemeCategory10);
+
+        /* ********************************** Write a function to perform the data-join  ********************************** */
 
         // Write your `draw` function to bind data, and position elements
         var draw = function() {
-            // Redefine which variable you want to visualize
+
+            // Redefine which value you want to visualize in your data by using the `.sum()` method
             root.sum(function(d) {
                 return +d[measure];
             });
 
-            // (Re)build your treemap data structure using your  root
+            // (Re)build your treemap data structure by passing your `root` to your `treemap` function
             treemap(root);
 
-            // Bind your data to a selection of node elements
+            // Bind your data to a selection of elements with class node
+            // The data that you want to join is array of elements returned by `root.leaves()`
             var nodes = div.selectAll(".node").data(root.leaves());
 
             // Enter and append elements, then position them using the appropriate *styles*
@@ -82,20 +86,18 @@ $(function() {
                 .attr('class', 'node')
                 .transition().duration(1500)
                 .style("left", function(d, i) {
-                    console.log(d)
                     return d.x0 + "px";
                 })
                 .style("top", function(d) {
                     return d.y0 + "px";
                 })
                 .style('width', function(d) {
-                    return d.x1 - d.x0 + 'px'
+                    return d.x1 - d.x0 + 'px';
                 })
                 .style("height", function(d) {
                     return d.y1 - d.y0 + "px";
                 })
                 .style("background", function(d, i) {
-                    console.log(d.region);
                     return colorScale(d.data.region);
                 });
         };
